@@ -42,28 +42,29 @@ class ListadoInspeccions {
 
 class Value {
     Value({
-        required this.id,
-        required this.terrenoId,
+        required this.pi,
+        required this.manzana,
+        required this.numlote,
         required this.fecha,
     });
 
-    int id;
-    String terrenoId;
+    String pi;
+    String manzana;
+    String numlote;
     DateTime fecha;
 
     factory Value.fromJson(Map<String, dynamic> json) => Value(
-        id: json["id"],
-        terrenoId: json["terreno_id"],
+        pi: json["pi"],
+        manzana: json["manzana"],
+        numlote: json["numlote"],
         fecha: DateTime.parse(json["fecha"]),
-      //  fecha:  formatDate(DateTime('d/M/y').parse(json["fecha"])),
-       
-        
     );
 
     Map<String, dynamic> toJson() => {
-        "id": id,
-        "terreno_id": terrenoId,
-        "fecha": fecha,
+        "pi": pi,
+        "manzana": manzana,
+        "numlote": numlote,
+        "fecha": "${fecha.year.toString().padLeft(4, '0')}-${fecha.month.toString().padLeft(2, '0')}-${fecha.day.toString().padLeft(2, '0')}",
     };
 }
 
@@ -107,8 +108,8 @@ class MyHomePage extends StatelessWidget {
               children: celulares.map(
                   (celular) => ListTile(
                     leading: Icon(Icons.file_copy_rounded),
-                    title: Text("PI: "+celular.terrenoId),
-                    subtitle: Text("FECHA: "+ celular.fecha.toString()),
+                    title: Text("PI: "+celular.pi+"\nMANZANA: "+celular.manzana+"\nLOTE: "+celular.numlote + "\nFECHA: "+ celular.fecha.toString()),
+                    //subtitle: Text("FECHA: "+ celular.fecha.toString()),
                     trailing: Icon(Icons.edit),
                   )
               ).toList()..add(ListTile())..add(ListTile())
