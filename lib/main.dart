@@ -58,6 +58,7 @@ class Value {
         manzana: json["manzana"],
         numlote: json["numlote"],
         fecha: DateTime.parse(json["fecha"]),
+        
     );
 
     Map<String, dynamic> toJson() => {
@@ -69,52 +70,111 @@ class Value {
 }
 
 
-void main() => runApp(MyApp());
+void main() {
+  runApp(MyApp());
+}
+
 
 
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    const appTitle = 'Isolate Demo';
-
     return MaterialApp(
-      title: appTitle,
-      home: MyHomePage(title: appTitle),
+      title: 'Flutter Demo',
+      debugShowCheckedModeBanner: false,
+      
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+        visualDensity: VisualDensity.adaptivePlatformDensity,
+      ),
+      initialRoute: "home",
+      routes: <String, Widget Function(BuildContext)>{
+        "home": (context) => HomePage(),
+      },
     );
   }
 }
 
-class MyHomePage extends StatelessWidget {
-  final String title;
+class HomePage extends StatefulWidget {
+  @override
+  _HomePageState createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  Widget appBarTitle = const Text("Ficha de Inspeccion");
+  Icon actionIcon = const Icon(Icons.search);
   
-
-  MyHomePage({Key?key, required this.title}) : super(key: key);
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(title),
+      appBar:  AppBar(
+        title: appBarTitle,
+        backgroundColor: const Color(0xff00783f),
+        automaticallyImplyLeading: false,
+         actions: <Widget>[
+             IconButton(icon: actionIcon,onPressed:(){
+              setState(() {
+                if (actionIcon.icon == Icons.search){
+                  actionIcon =  Icon(Icons.close);
+                  appBarTitle =   TextField(
+                    style: const TextStyle(
+                      color: Colors.white,
+                    ),
+                    decoration: const InputDecoration(
+                        prefixIcon: Icon(Icons.search,color: Colors.white),
+                        hintText: "Buscar la PI...",
+                        hintStyle: TextStyle(color: Colors.white)
+                    ),
+                    onTap: () =>  FutureBuilder<ListadoInspeccions>(
+                        future: fetchPhotos(),
+                        builder: (context, snapshot) {
+                          if (snapshot.hasData) {
+                          List<Value> inspeccions = snapshot.data!.values;
+                          return ListView(
+                            children: inspeccions.map(
+                              (inspeccion) => ListTile(
+                              leading: const Icon(Icons.file_copy_rounded),
+                              title: Text("PI: ${inspeccion.pi}\nMANZANA: ${inspeccion.manzana}\nLOTE: ${inspeccion.numlote}\nFECHA: ${formatDate(inspeccion.fecha, [dd, '-', mm, '-', yyyy, ' '])}"),
+                              //subtitle: Text(),
+                              trailing: const Icon(Icons.edit),
+                            ),
+                          ).toList()..add(const ListTile())..add(const ListTile())
+                          );
+                        } else if (snapshot.hasError) {
+                          return Text('${snapshot.error}');
+                        }
+
+                // By default, show a loading spinner.
+                return const CircularProgressIndicator();
+              },
+            ),
+                    keyboardType: TextInputType.number,
+                  );}
+                else {
+                  actionIcon = const Icon(Icons.search);
+                  appBarTitle = const Text("Ficha de Inspeccion");
+                }
+              });
+            } ,),],
+        centerTitle: true,
       ),
       body: Center(
           child: (
               FutureBuilder<ListadoInspeccions>(
               future: fetchPhotos(),
               builder: (context, snapshot) {
-
                 if (snapshot.hasData) {
-                  List<Value> celulares = snapshot.data!.values;
+                 List<Value> inspeccions = snapshot.data!.values;
                  return ListView(
-              children: celulares.map(
-                  (celular) => ListTile(
-                    leading: Icon(Icons.file_copy_rounded),
-                    title: Text("PI: "+celular.pi+"\nMANZANA: "+celular.manzana+"\nLOTE: "+celular.numlote + "\nFECHA: "+ celular.fecha.toString()),
-                    //subtitle: Text("FECHA: "+ celular.fecha.toString()),
-                    trailing: Icon(Icons.edit),
-                  )
-              ).toList()..add(ListTile())..add(ListTile())
-            );
-
+                  children: inspeccions.map(
+                    (inspeccion) => ListTile(
+                    leading: const Icon(Icons.file_copy_rounded),
+                    title: Text("PI: ${inspeccion.pi}\nMANZANA: ${inspeccion.manzana}\nLOTE: ${inspeccion.numlote}\nFECHA: ${formatDate(inspeccion.fecha, [dd, '-', mm, '-', yyyy, ' '])}"),
+                    //subtitle: Text(),
+                    trailing: const Icon(Icons.edit),
+                  ),
+                 ).toList()..add(const ListTile())..add(const ListTile())
+              );
                 } else if (snapshot.hasError) {
                   return Text('${snapshot.error}');
                 }
